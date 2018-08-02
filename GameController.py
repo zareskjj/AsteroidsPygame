@@ -34,8 +34,8 @@ x = 390
 y = 550
 
 # Sprite speeds
-player_speed = 4
-proj_speed = 8
+player_speed = 3
+proj_speed = 6
 
 # UP, DOWN, LEFT, RIGHT flags
 moves = [False, False, False, False]
@@ -144,7 +144,6 @@ while not end_game:
 
     for a in asteroids:
         pygame.draw.circle(screen, WHITE, (a[0], a[1]), a[2], a[2])
-    #shots = filter_shots(shots)
     filter_shots(shots)
     for s in shots:
         pygame.draw.circle(screen, RED, (s[0], s[1]), 2, 2)
