@@ -10,6 +10,10 @@ pygame.init()
 HEIGHT = 600
 WIDTH = 800
 
+SHOT_WIDTH = 2
+PLAYER_OBJ_WIDTH = 10
+lives = 3
+
 # Set window size
 window_size = (WIDTH, HEIGHT)
 
@@ -40,12 +44,20 @@ proj_speed = 6
 # UP, DOWN, LEFT, RIGHT flags
 moves = [False, False, False, False]
 
-shots = [] # [ (x, y, lifetime) ]
+# [[Asteroid-x, Asteroid-y, Asteroid-radius], ...]
+asteroids = list()
+
+# [ (x, y, lifetime) ]
+shots = []
 
 def show_fps():
     frames = clock.get_fps()
     frames_label = default_font.render("%d FPS" % frames, 1, GREEN)
     screen.blit(frames_label, (30, 30))
+
+def show_lives(lives):
+    lives_label = default_font.render("%d LIVES" % lives, 1, RED)
+    screen.blit(lives_label, (30, 50))
 
 def limit_player_movement(x, y):
     if x > WIDTH - 15:
@@ -100,9 +112,23 @@ def asteroid_limit(a):
     if a[1] + a[2] > HEIGHT:
         return False
     return True
-
-# [[Asteroid-x, Asteroid-y, Asteroid-radius], ...]
-asteroids = list()
+# Player_pos: (x,y)
+# astrs: from asteroids list
+# live_shots: from shots list
+def detect_collisions(player_pos, astrs, live_shots, lives):
+    newAstr = list()
+    addAstr = True
+    for a in astrs:
+        if abs(player_pos[0] - a[0]) <= a[2] and abs(player_pos[1] - a[1]) <= a[2]:
+            lives = lives - 1
+            addAstr = False
+            print("Lost life.")
+        for s in live_shots:
+            if abs(s[0] - a[0]) <= a[2] and abs(s[1] - a[1]) <= a[2]:
+                addAstr = False
+        if addAstr:
+            newAstr.append(a)
+    return (newAstr, lives, live_shots)
 
 while not end_game:
     # Fill black screen every frame, redraw after.
@@ -112,7 +138,7 @@ while not end_game:
     while len(asteroids) < 40:
         ax = randrange(WIDTH)
         ay = -1 * randrange(HEIGHT)
-        ar = randrange(0, 10)
+        ar = randrange(5, 15)
         asteroids.append([ax, ay, ar])
 
     # For all events in pygame window at this frame
@@ -141,17 +167,22 @@ while not end_game:
     for a in asteroids:
         a[1] = a[1] + proj_speed
     asteroids = list(filter(asteroid_limit, asteroids))
+    asteroids, lives, shots = detect_collisions((x,y), asteroids, shots, lives)
 
     for a in asteroids:
         pygame.draw.circle(screen, WHITE, (a[0], a[1]), a[2], a[2])
     filter_shots(shots)
     for s in shots:
-        pygame.draw.circle(screen, RED, (s[0], s[1]), 2, 2)
+        pygame.draw.circle(screen, RED, (s[0], s[1]), SHOT_WIDTH, SHOT_WIDTH)
         s[1] = s[1] - proj_speed
 
-    p1 = pygame.draw.polygon(screen, BLUE, [[x, y], [x - 10, y + 10], [x + 10, y + 10]], 2)
+    pygame.draw.polygon(screen, BLUE, [[x, y], [x - PLAYER_OBJ_WIDTH, y + PLAYER_OBJ_WIDTH], [x + PLAYER_OBJ_WIDTH, y + PLAYER_OBJ_WIDTH]], 2)
 
     show_fps()
+    show_lives(lives)
+
+    if (lives <= 0):
+        end_game = True
     pygame.display.flip() #draws new frame over previous frame
     clock.tick(60)
 
