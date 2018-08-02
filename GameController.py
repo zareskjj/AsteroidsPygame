@@ -101,7 +101,7 @@ def asteroid_limit(a):
         return False
     return True
 
-# [[Asteroid-x, Asteroid-y, Asteroid-type], ...]
+# [[Asteroid-x, Asteroid-y, Asteroid-radius], ...]
 asteroids = list()
 
 while not end_game:
