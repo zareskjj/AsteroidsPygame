@@ -21,9 +21,8 @@ RED      = ( 255,   0,   0)
 BLUE     = (   0,   0, 255)
 
 screen = pygame.display.set_mode(window_size)
-
 pygame.display.set_caption("PYGAME WINDOW")
-default_font = pygame.font.SysFont("monospace", 12)
+default_font = pygame.font.SysFont("monospace", 14)
 
 # Game over flag
 end_game = False
@@ -45,7 +44,7 @@ shots = [] # [ (x, y, lifetime) ]
 
 def show_fps():
     frames = clock.get_fps()
-    frames_label = default_font.render("%.2f FPS" % frames, 1, WHITE)
+    frames_label = default_font.render("%d FPS" % frames, 1, GREEN)
     screen.blit(frames_label, (30, 30))
 
 def limit_player_movement(x, y):
@@ -97,21 +96,6 @@ def player_movement_key_release(e):
     if e.key == pygame.K_s:
         moves[1] = False
 
-# astr = [AX, AY, AR]
-# return [[], ...] of polygon sides
-#def gen_asteroid_sides(astr):
-    # sides = list()
-    # for i in range(6 + (astr[2] * 2)):
-    #     if i == 1:
-    #         a1 = astr[0]
-    #         a2 = astr[1]
-    #     else:
-    #         a1 = randint(10,30) + astr[0]
-    #         a2 = randint(10,30) + astr[1]
-    #
-    #     sides.append([a1, a2])
-    # return sides
-
 def asteroid_limit(a):
     if a[1] + a[2] > HEIGHT:
         return False
@@ -125,7 +109,7 @@ while not end_game:
     screen.fill(BLACK)
 
     #Generate asteroids
-    while len(asteroids) < 12:
+    while len(asteroids) < 40:
         ax = randrange(WIDTH)
         ay = -1 * randrange(HEIGHT)
         ar = randrange(0, 10)
@@ -149,13 +133,6 @@ while not end_game:
                     shots.insert(0, [x, y, 80])
             if e.type == pygame.KEYUP: #button press
                 player_movement_key_release(e)
-
-            #if e.type == pygame.MOUSEBUTTONDOWN:
-            #    playerxs, playerys = e.pos
-            #    print("X:%d Y:%d" % (playerxs, playerys))
-            #if e.type == pygame.MOUSEBUTTONUP:
-            #    playerxe, playerye = e.pos
-            #    print("X:%d Y:%d" % (playerxe, playerye))
 
     x, y = move_player(x, y)
     x, y = limit_player_movement(x, y)
